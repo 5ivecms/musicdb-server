@@ -1,7 +1,7 @@
-import type { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm'
+import type { Repository } from 'typeorm'
 
-import { prepareObject, prepareOrder, prepareSearch } from '../../utils/object'
-import type { SearchDto } from '../dto/search.dto'
+import type { SearchDto } from './search.dto'
+import { getRelations, prepareObject, prepareOrder, prepareSearch } from './utils'
 
 export class SearchService<T> {
   constructor(private readonly repository: Repository<T>) {}
@@ -11,7 +11,6 @@ export class SearchService<T> {
       const newDto = prepareObject(dto) as SearchDto<T>
 
       let { limit, page, order, orderBy } = newDto
-      const { search } = newDto
 
       orderBy = orderBy || 'id'
       order = (order || 'desc').toUpperCase()
@@ -24,19 +23,9 @@ export class SearchService<T> {
 
       const offset = (page - 1) * limit
 
-      let relations: FindOptionsRelations<T> = {}
-      if (newDto.relations) {
-        relations = newDto.relations
-      }
-
-      let where: FindOptionsWhere<T> = {}
-      if (search) {
-        where = prepareSearch(search)
-      }
-
       const [items, total] = await this.repository.findAndCount({
-        relations,
-        where,
+        relations: newDto.relations ?? getRelations(newDto.search),
+        where: newDto.search ? prepareSearch(newDto.search) : {},
         skip: offset,
         take: limit,
         order: prepareOrder({ [orderBy]: order }),
