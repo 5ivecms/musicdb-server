@@ -1,5 +1,6 @@
-import { isBoolean, isBooleanString, isNumber, isNumberString } from 'class-validator'
+import { isBoolean, isBooleanString, isNumber, isNumberString, isString } from 'class-validator'
 import * as dot from 'dot-object'
+import { ILike } from 'typeorm'
 
 export const prepareObject = (object: object) => {
   const stringObject = dot.dot(object) as Record<string, string>
@@ -20,4 +21,19 @@ export const prepareObject = (object: object) => {
   })
 
   return dot.object(newObj)
+}
+
+export const prepareSearch = (object: object) => {
+  const stringObject = dot.dot(object) as Record<string, string>
+  const newObject: object = {}
+
+  Object.keys(stringObject).map((key) => {
+    if (isString(stringObject[key])) {
+      newObject[key] = ILike(`%${stringObject[key]}%`)
+      return
+    }
+    newObject[key] = stringObject[key]
+  })
+
+  return dot.object(newObject)
 }

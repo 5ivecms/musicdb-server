@@ -8,7 +8,7 @@ import { In, Repository } from 'typeorm'
 import type { FindOptionsRelations } from 'typeorm/find-options/FindOptionsRelations'
 import type { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere'
 
-import { prepareObject } from '../../utils/object'
+import { prepareObject, prepareSearch } from '../../utils/object'
 import { ArtistService } from '../artist/artist.service'
 import { GenresService } from '../genres/genres.service'
 import { ReleasesService } from '../releases/releases.service'
@@ -63,7 +63,7 @@ export class SongsService {
 
     let where: FindOptionsWhere<SongEntity> = {}
     if (search) {
-      where = { ...search }
+      where = { ...prepareSearch(search) }
     }
 
     const [items, total] = await this.songsRepository.findAndCount({
