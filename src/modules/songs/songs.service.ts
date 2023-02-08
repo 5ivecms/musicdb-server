@@ -39,45 +39,11 @@ export class SongsService {
   }
 
   public async search(dto: SearchSongsDto) {
-    const newDto = prepareObject(dto) as SearchSongsDto
+    try {
+      const newDto = prepareObject(dto) as SearchSongsDto
 
-    let { limit, page, order, orderBy } = newDto
-    const { search } = newDto
-
-    orderBy = orderBy || 'id'
-    order = (order || 'desc').toUpperCase()
-
-    limit = limit || 10
-    limit > 100 ? 100 : limit
-
-    page = page || 1
-    page < 1 ? 1 : page
-
-    const offset = (page - 1) * limit
-
-    let relations: FindOptionsRelations<SongEntity> = {}
-    if (newDto.relations) {
-      relations = newDto.relations
-    }
-
-    let where: FindOptionsWhere<SongEntity> = {}
-    if (search) {
-      where = prepareSearch(search)
-    }
-
-    const [items, total] = await this.songsRepository.findAndCount({
-      relations,
-      where,
-      skip: offset,
-      take: limit,
-      order: prepareOrder({ [orderBy]: order }),
-    })
-
-    return { items, total, page, limit }
-
-    /* try {
-      let { limit, page, order, orderBy } = dto
-      const { search } = dto
+      let { limit, page, order, orderBy } = newDto
+      const { search } = newDto
 
       orderBy = orderBy || 'id'
       order = (order || 'desc').toUpperCase()
@@ -85,21 +51,19 @@ export class SongsService {
       limit = limit || 10
       limit > 100 ? 100 : limit
 
-      page = Number(page)
       page = page || 1
       page < 1 ? 1 : page
 
       const offset = (page - 1) * limit
 
       let relations: FindOptionsRelations<SongEntity> = {}
-      if (dto.relations) {
-        relations = { ...dto.relations }
+      if (newDto.relations) {
+        relations = newDto.relations
       }
 
-      console.log(Object.keys(search))
       let where: FindOptionsWhere<SongEntity> = {}
       if (search) {
-        where = { ...search }
+        where = prepareSearch(search)
       }
 
       const [items, total] = await this.songsRepository.findAndCount({
@@ -107,15 +71,13 @@ export class SongsService {
         where,
         skip: offset,
         take: limit,
-        order: { [orderBy]: order },
+        order: prepareOrder({ [orderBy]: order }),
       })
 
       return { items, total, page, limit }
     } catch (e) {
-      console.log(e)
-      console.log('ошибка')
       return { items: [], total: 0, page: 1, limit: 10 }
-    } */
+    }
   }
 
   public async findBySourceId(sourceId: number): Promise<SongEntity> {
