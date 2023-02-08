@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import type { DeleteResult, UpdateResult } from 'typeorm'
 import { In, Repository } from 'typeorm'
 
-import { SearchService } from '../../common/services/SearchService'
+import { SearchService } from '../../common/services/search.service'
 import { ArtistService } from '../artist/artist.service'
 import { GenresService } from '../genres/genres.service'
 import { ReleasesService } from '../releases/releases.service'
