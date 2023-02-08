@@ -37,3 +37,5 @@ export const prepareSearch = (object: object) => {
 
   return dot.object(newObject)
 }
+
+export const prepareOrder = (object: object) => dot.object(object)

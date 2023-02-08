@@ -8,7 +8,7 @@ import { In, Repository } from 'typeorm'
 import type { FindOptionsRelations } from 'typeorm/find-options/FindOptionsRelations'
 import type { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere'
 
-import { prepareObject, prepareSearch } from '../../utils/object'
+import { prepareObject, prepareOrder, prepareSearch } from '../../utils/object'
 import { ArtistService } from '../artist/artist.service'
 import { GenresService } from '../genres/genres.service'
 import { ReleasesService } from '../releases/releases.service'
@@ -50,7 +50,6 @@ export class SongsService {
     limit = limit || 10
     limit > 100 ? 100 : limit
 
-    page = Number(page)
     page = page || 1
     page < 1 ? 1 : page
 
@@ -58,12 +57,12 @@ export class SongsService {
 
     let relations: FindOptionsRelations<SongEntity> = {}
     if (newDto.relations) {
-      relations = { ...newDto.relations }
+      relations = newDto.relations
     }
 
     let where: FindOptionsWhere<SongEntity> = {}
     if (search) {
-      where = { ...prepareSearch(search) }
+      where = prepareSearch(search)
     }
 
     const [items, total] = await this.songsRepository.findAndCount({
@@ -71,7 +70,7 @@ export class SongsService {
       where,
       skip: offset,
       take: limit,
-      order: { [orderBy]: order },
+      order: prepareOrder({ [orderBy]: order }),
     })
 
     return { items, total, page, limit }
